@@ -1,0 +1,60 @@
+description: null
+devices:
+  adjust_period: null
+  capture:
+    autoconnect_to: alsa_input.usb-Focusrite_Scarlett_4i4_USB_D8GBQMP242831C-00.analog-surround-21
+    channels: 2
+    labels: null
+    node_description: null
+    node_group_name: null
+    node_name: null
+    type: PipeWire
+  capture_samplerate: null
+  chunksize: 256
+  enable_rate_adjust: null
+  multithreaded: null
+  playback:
+    autoconnect_to: alsa_output.usb-Focusrite_Scarlett_4i4_USB_D8GBQMP242831C-00.analog-surround-40
+    channels: 2
+    node_description: null
+    node_group_name: null
+    node_name: null
+    type: PipeWire
+  queuelimit: null
+  rate_measure_interval: null
+  resampler: null
+  samplerate: 48000
+  silence_threshold: null
+  silence_timeout: null
+  stop_on_rate_change: null
+  target_level: null
+  volume_limit: null
+  volume_ramp_time: null
+  worker_threads: null
+filters:
+  sub_gain:
+    description: null
+    parameters:
+      gain: 0.0
+      inverted: null
+      mute: null
+      scale: null
+    type: Gain
+  sub_lowpass:
+    description: null
+    parameters:
+      freq: 120.0
+      q: 0.707
+      type: Lowpass
+    type: Biquad
+mixers: null
+pipeline:
+- channels:
+  - 0
+  - 1
+  names:
+  - sub_lowpass
+  - sub_gain
+  type: Filter
+processors: null
+title: null

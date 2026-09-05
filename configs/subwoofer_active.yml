@@ -1,0 +1,30 @@
+devices:
+  capture:
+    autoconnect_to: alsa_input.usb-Focusrite_Scarlett_4i4_USB_D8GBQMP242831C-00.analog-surround-21
+    channels: 2
+    type: PipeWire
+  chunksize: 256
+  playback:
+    autoconnect_to: alsa_output.usb-Focusrite_Scarlett_4i4_USB_D8GBQMP242831C-00.analog-surround-40
+    channels: 2
+    type: PipeWire
+  samplerate: 48000
+filters:
+  sub_gain:
+    parameters:
+      gain: 5.0
+    type: Gain
+  sub_lowpass:
+    parameters:
+      freq: 120.0
+      q: 0.707
+      type: Lowpass
+    type: Biquad
+pipeline:
+- channels:
+  - 0
+  - 1
+  names:
+  - sub_lowpass
+  - sub_gain
+  type: Filter

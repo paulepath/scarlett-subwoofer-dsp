@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Focusrite Subwoofer Remote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #090a0d;
+    --card: #13151b;
+    --card-border: rgba(255, 255, 255, 0.08);
+    --primary: #3b82f6;
+    --primary-glow: rgba(59, 130, 246, 0.4);
+    --sub: #f59e0b;
+    --sub-glow: rgba(245, 158, 11, 0.4);
+    --text: #f9fafb;
+    --text-dim: #9ca3af;
+    --text-muted: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .container {
+    width: 100%;
+    max-width: 440px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 24px 20px;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .title-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .title {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+  }
+  .subtitle {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(34, 197, 94, 0.12);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+
+  /* Input Mode Bar */
+  .input-mode-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0,0,0,0.35);
+    padding: 8px 12px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .input-mode-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .mode-pills {
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.06);
+    padding: 3px;
+    border-radius: 10px;
+  }
+  .mode-pill {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mode-pill.active {
+    background: #2563eb;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+  }
+
+  /* Hero Mode Switcher */
+  .mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: rgba(0,0,0,0.45);
+    padding: 6px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .mode-btn {
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    padding: 16px 12px;
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .mode-btn svg { width: 24px; height: 24px; }
+  .mode-btn.active.unfiltered {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 4px 20px var(--primary-glow);
+  }
+  .mode-btn.active.bass {
+    background: var(--sub);
+    color: #fff;
+    box-shadow: 0 4px 20px var(--sub-glow);
+  }
+  .mode-btn:active { transform: scale(0.97); }
+
+  /* Bass Controls Panel */
+  .bass-panel {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    max-height: 500px;
+    overflow: hidden;
+  }
+  .bass-panel.collapsed {
+    opacity: 0.25;
+    pointer-events: none;
+    filter: grayscale(0.9);
+  }
+  .section-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .value-pill {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    padding: 3px 9px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    user-select: none;
+  }
+  .chips {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .chip {
+    flex: 1;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    color: var(--text-dim);
+    padding: 8px 0;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .chip.active, .chip:active {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.6);
+  }
+  .slider-box {
+    margin-bottom: 20px;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fbbf24;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  
+  /* Dual Stereo VU Meters */
+  .meters-container {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .meter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .meter-group-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  .meter-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+  }
+  .meter-channel {
+    width: 14px;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-muted);
+  }
+  .meter-bar-bg {
+    flex: 1;
+    height: 7px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .meter-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #f59e0b 80%, #ef4444 100%);
+    border-radius: 4px;
+    transition: width 0.08s ease-out;
+  }
+  .meter-db {
+    width: 44px;
+    text-align: right;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="title-group">
+      <span class="title">Focusrite Scarlett</span>
+      <span class="subtitle">Subwoofer & Bass DSP Remote</span>
+    </div>
+    <div class="status-badge">
+      <div class="dot"></div>
+      <span id="conn-text">Live</span>
+    </div>
+  </div>
+
+  <!-- Input Mode Selector (Mono In 3 vs Stereo In 3 & 4) -->
+  <div class="input-mode-bar">
+    <span class="input-mode-label">Input Source</span>
+    <div class="mode-pills">
+      <button class="mode-pill active" id="pill-mono" onclick="setInputMode('mono')">Mono (In 3)</button>
+      <button class="mode-pill" id="pill-stereo" onclick="setInputMode('stereo')">Stereo (3 & 4)</button>
+    </div>
+  </div>
+
+  <!-- Hero Mode Toggle: Full Sound vs Bass Only -->
+  <div class="mode-switch">
+    <button class="mode-btn unfiltered" id="btn-unfiltered" onclick="setMode('unfiltered')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18V5l12-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="18" cy="16" r="3"></circle>
+      </svg>
+      <span>Full Sound</span>
+    </button>
+    <button class="mode-btn bass active" id="btn-bass" onclick="setMode('bass')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 6h16M4 12h16M4 18h16"></path>
+        <circle cx="8" cy="6" r="2" fill="currentColor"></circle>
+        <circle cx="16" cy="12" r="2" fill="currentColor"></circle>
+        <circle cx="10" cy="18" r="2" fill="currentColor"></circle>
+      </svg>
+      <span>Bass Only</span>
+    </button>
+  </div>
+
+  <!-- Bass Controls Panel -->
+  <div class="bass-panel" id="bass-panel">
+    <div class="section-label">
+      <span>Crossover Cutoff</span>
+      <span class="value-pill" id="freq-val">120 Hz</span>
+    </div>
+    
+    <div class="chips">
+      <button class="chip" onclick="setPresetFreq(60)">60 Hz</button>
+      <button class="chip" onclick="setPresetFreq(80)">80 Hz</button>
+      <button class="chip" onclick="setPresetFreq(100)">100 Hz</button>
+      <button class="chip active" onclick="setPresetFreq(120)">120 Hz</button>
+      <button class="chip" onclick="setPresetFreq(150)">150 Hz</button>
+      <button class="chip" onclick="setPresetFreq(200)">200 Hz</button>
+    </div>
+
+    <div class="slider-box">
+      <input type="range" id="freq-slider" min="40" max="300" step="5" value="120" oninput="onFreqChange(this.value)">
+    </div>
+
+    <div class="section-label">
+      <span>Bass Boost / Gain</span>
+      <span class="value-pill" id="gain-val" title="Click to reset to 0 dB" onclick="resetGain()">0.0 dB</span>
+    </div>
+    <div class="slider-box">
+      <input type="range" id="gain-slider" min="-12" max="12" step="0.5" value="0" oninput="onGainChange(this.value)">
+    </div>
+  </div>
+
+  <!-- Dual-Channel Live VU Level Meters -->
+  <div class="meters-container">
+    <div class="meter-group">
+      <div class="meter-group-header">
+        <span>Input Signal (Rear Sockets)</span>
+        <span id="in-mode-text">Mono L+R</span>
+      </div>
+      <div class="meter-row">
+        <span class="meter-channel">L</span>
+        <div class="meter-bar-bg"><div class="meter-bar-fill" id="meter-in-l"></div></div>
+        <span class="meter-db" id="meter-in-l-db">--</span>
+      </div>
+      <div class="meter-row">
+        <span class="meter-channel">R</span>
+        <div class="meter-bar-bg"><div class="meter-bar-fill" id="meter-in-r"></div></div>
+        <span class="meter-db" id="meter-in-r-db">--</span>
+      </div>
+    </div>
+
+    <div class="meter-group" style="margin-top: 4px;">
+      <div class="meter-group-header">
+        <span>Output Signal (Speakers 1 & 2)</span>
+        <span id="out-mode-text">Active</span>
+      </div>
+      <div class="meter-row">
+        <span class="meter-channel">L</span>
+        <div class="meter-bar-bg"><div class="meter-bar-fill" id="meter-out-l"></div></div>
+        <span class="meter-db" id="meter-out-l-db">--</span>
+      </div>
+      <div class="meter-row">
+        <span class="meter-channel">R</span>
+        <div class="meter-bar-bg"><div class="meter-bar-fill" id="meter-out-r"></div></div>
+        <span class="meter-db" id="meter-out-r-db">--</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentMode = 'bass';
+let debounceTimer = null;
+let lastInteractionTime = 0;
+
+async function fetchStatus() {
+  try {
+    const res = await fetch('/api/status');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    updateUI(data);
+    document.getElementById('conn-text').innerText = 'Live';
+  } catch (e) {
+    document.getElementById('conn-text').innerText = 'Offline';
+  }
+}
+
+function updateUI(data) {
+  // Update Live Meters continuously (never blocked)
+  updateMeter('meter-in-l', 'meter-in-l-db', data.cap_peak ? data.cap_peak[0] : -100);
+  updateMeter('meter-in-r', 'meter-in-r-db', data.cap_peak ? data.cap_peak[1] : -100);
+  updateMeter('meter-out-l', 'meter-out-l-db', data.pb_peak ? data.pb_peak[0] : -100);
+  updateMeter('meter-out-r', 'meter-out-r-db', data.pb_peak ? data.pb_peak[1] : -100);
+
+  // If user interacted recently (within 1200ms), do not overwrite controls from server
+  // This prevents race-condition rubber-banding / button jumping!
+  if (Date.now() - lastInteractionTime < 1200) {
+    return;
+  }
+
+  currentMode = data.mode;
+  const isBass = (data.mode === 'bass');
+  
+  document.getElementById('btn-unfiltered').classList.toggle('active', !isBass);
+  document.getElementById('btn-bass').classList.toggle('active', isBass);
+  document.getElementById('bass-panel').classList.toggle('collapsed', !isBass);
+  
+  // Input mode pills
+  const isStereo = (data.input_mode === 'stereo');
+  document.getElementById('pill-mono').classList.toggle('active', !isStereo);
+  document.getElementById('pill-stereo').classList.toggle('active', isStereo);
+  document.getElementById('in-mode-text').innerText = isStereo ? 'Stereo In 3+4' : 'Mono (In 3)';
+  
+  // Cutoff slider & presets
+  document.getElementById('freq-slider').value = data.freq;
+  document.getElementById('freq-val').innerText = Math.round(data.freq) + ' Hz';
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active', parseInt(c.innerText) === Math.round(data.freq));
+  });
+  
+  // Gain slider
+  document.getElementById('gain-slider').value = data.gain;
+  document.getElementById('gain-val').innerText = (data.gain > 0 ? '+' : '') + data.gain.toFixed(1) + ' dB';
+}
+
+function updateMeter(barId, textId, db) {
+  const elBar = document.getElementById(barId);
+  const elText = document.getElementById(textId);
+  if (!elBar || !elText) return;
+  
+  const clamped = Math.max(-60, Math.min(0, db));
+  const pct = Math.round(((clamped + 60) / 60) * 100);
+  elBar.style.width = pct + '%';
+  elText.innerText = (db <= -58 || isNaN(db)) ? '--' : Math.round(db) + ' dB';
+}
+
+async function setMode(mode) {
+  lastInteractionTime = Date.now();
+  currentMode = mode;
+  const isBass = (mode === 'bass');
+  document.getElementById('btn-unfiltered').classList.toggle('active', !isBass);
+  document.getElementById('btn-bass').classList.toggle('active', isBass);
+  document.getElementById('bass-panel').classList.toggle('collapsed', !isBass);
+  
+  try {
+    await fetch('/api/mode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode })
+    });
+  } catch(e) {}
+}
+
+async function setInputMode(mode) {
+  lastInteractionTime = Date.now();
+  const isStereo = (mode === 'stereo');
+  document.getElementById('pill-mono').classList.toggle('active', !isStereo);
+  document.getElementById('pill-stereo').classList.toggle('active', isStereo);
+  document.getElementById('in-mode-text').innerText = isStereo ? 'Stereo In 3+4' : 'Mono (In 3)';
+  
+  try {
+    await fetch('/api/input_mode', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input_mode: mode })
+    });
+  } catch(e) {}
+}
+
+async function setPresetFreq(freq) {
+  lastInteractionTime = Date.now();
+  document.getElementById('freq-slider').value = freq;
+  document.getElementById('freq-val').innerText = Math.round(freq) + ' Hz';
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active', parseInt(c.innerText) === Math.round(freq));
+  });
+  
+  clearTimeout(debounceTimer);
+  const gain = parseFloat(document.getElementById('gain-slider').value);
+  try {
+    await fetch('/api/filter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ freq: parseFloat(freq), gain })
+    });
+  } catch(e) {}
+}
+
+function onFreqChange(val) {
+  lastInteractionTime = Date.now();
+  document.getElementById('freq-val').innerText = Math.round(val) + ' Hz';
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active', parseInt(c.innerText) === Math.round(val));
+  });
+  scheduleFilterUpdate();
+}
+
+function onGainChange(val) {
+  lastInteractionTime = Date.now();
+  const g = parseFloat(val);
+  document.getElementById('gain-val').innerText = (g > 0 ? '+' : '') + g.toFixed(1) + ' dB';
+  scheduleFilterUpdate();
+}
+
+function resetGain() {
+  lastInteractionTime = Date.now();
+  document.getElementById('gain-slider').value = 0;
+  onGainChange(0);
+}
+
+function scheduleFilterUpdate() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(async () => {
+    const freq = parseFloat(document.getElementById('freq-slider').value);
+    const gain = parseFloat(document.getElementById('gain-slider').value);
+    try {
+      await fetch('/api/filter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ freq, gain })
+      });
+    } catch(e) {}
+  }, 100);
+}
+
+setInterval(fetchStatus, 250);
+fetchStatus();
+</script>
+</body>
+</html>

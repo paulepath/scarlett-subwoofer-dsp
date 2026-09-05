@@ -1,0 +1,25 @@
+devices:
+  samplerate: 48000
+  chunksize: 1024
+  capture:
+    type: PipeWire
+    channels: 2
+  playback:
+    type: PipeWire
+    channels: 2
+
+filters:
+  sub_lowpass:
+    type: Biquad
+    parameters:
+      type: Lowpass
+      freq: 120.0
+      q: 0.707
+
+pipeline:
+  - type: Filter
+    channels:
+      - 0
+      - 1
+    names:
+      - sub_lowpass

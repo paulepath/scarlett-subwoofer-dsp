@@ -1,0 +1,28 @@
+---
+page_title: CamillaDSP - Subwoofer Control
+hide_capture_samplerate: false
+hide_silence: false
+hide_capture_device: false
+hide_playback_device: false
+hide_rate_monitoring: false
+hide_multithreading: false
+apply_config_automatically: true
+status_update_interval: 100
+volume_range: 50
+volume_max: 0
+custom_shortcuts:
+  - section: "Subwoofer Crossover"
+    description: "Adjust the low-pass cutoff frequency and bass gain in real time."
+    shortcuts:
+      - name: "Low-Pass Cutoff (Hz)"
+        config_elements:
+          - path: ["filters", "sub_lowpass", "parameters", "freq"]
+        range_from: 50
+        range_to: 300
+        step: 5
+      - name: "Bass Gain (dB)"
+        config_elements:
+          - path: ["filters", "sub_gain", "parameters", "gain"]
+        range_from: -12
+        range_to: 12
+        step: 0.5
