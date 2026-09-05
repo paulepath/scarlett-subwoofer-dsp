@@ -8,6 +8,8 @@ devices:
     autoconnect_to: alsa_output.usb-Focusrite_Scarlett_4i4_USB_D8GBQMP242831C-00.analog-surround-40
     channels: 2
     type: PipeWire
+  queuelimit: 1
   samplerate: 48000
+  target_level: 256
 filters: {}
 pipeline: []

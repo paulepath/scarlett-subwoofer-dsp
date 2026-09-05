@@ -20,14 +20,14 @@ devices:
     node_group_name: null
     node_name: null
     type: PipeWire
-  queuelimit: null
+  queuelimit: 1
   rate_measure_interval: null
   resampler: null
   samplerate: 48000
   silence_threshold: null
   silence_timeout: null
   stop_on_rate_change: null
-  target_level: null
+  target_level: 256
   volume_limit: null
   volume_ramp_time: null
   worker_threads: null
